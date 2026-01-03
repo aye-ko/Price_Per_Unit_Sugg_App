@@ -17,7 +17,7 @@
    ```
 
 ## Overview
-An app where Bakers, Chefs, Restaurateurs, and people in similar fields set the price of a single item to optimize their profit margins. They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), expected monthly customer number, and their desired profit margin, and it returns how much they should make and the price they should charge for each item, which vendor they should buy from, and how much to buy to meet that demand. It also returns the market tolerance for that price, the best-case and worst-case profit margins for that month, and the month's average profit margin. 
+An app where Bakers, Chefs, Restaurateurs, and people in similar fields set the price of a single item to optimize their profit margins. They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), expected monthly customer number, and their desired profit margin, and it returns how much they should make and the price they should charge for each item, and how much to buy to meet that demand. It also returns the market tolerance for that price, the best-case and worst-case profit margins for that month, and the month's average profit margin. 
 
 ## Live Demo
 [Link - placeholder for now]
