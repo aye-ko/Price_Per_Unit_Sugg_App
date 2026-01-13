@@ -38,9 +38,8 @@ It also returns the best-case, most likely, and worst-case profit margin to prov
 
 ## Data Sources
 - What Chefs Want 
-- Costco
+- Kroger API
 - PREP
-- Web Scraping
 - Bureau of Labor Statistics
 - Census.gov
 
