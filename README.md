@@ -23,44 +23,30 @@ An app where Bakers, Chefs, Restaurateurs, and people in similar fields set the 
 [Link - placeholder for now]
 
 ## Business Problem
-New food entrepreneurs struggle to set prices for their products. They guess, overprice, spend money on tools to do it for them, or spend weeks researching.
-
+Bakers, chefs, and the like know how to make delicious food, but often lack business sense when it comes to pricing their products to make the most bang for their buck. The time invested in setting their prices is usually tedious, takes away from their craft, or capital they could invest in other things. 
+The idea is to save them time and money, while offering them some predictability in an otherwise unpredictable field. 
 
 ## How It Works
-User Inputs the following: 
-
-- Recipe name
-- Ingredients + costs (manual entry for MVP)
-- Number of servings
-- Desired profit margin
-- Overhead costs (labor rate × hours)
-- Zip code
-- Experience level (beginner/intermediate/experienced)
-- Expected number of customers
-
-App outputs the following:
-
-- Price per unit
-- Batch price
-- Competitor price range (min, median, max)
-- User's percentile ("higher than 75% of competitors")
-- Market fit rating (High / Medium / Low)
-- Probability of reaching profit goal (Monte Carlo)
+They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), and their desired profit margin. The app determines the price per plate to achieve this goal. What amount should they set to serve this number of customers and achieve the suggested best price? If they enter a number of customers above the maximum the vendor sells at wholesale, a flag is raised, and it recommends either reducing the number of customers or increasing it to meet the demand, as they see fit. It also gives an idea of the market tolerance for this price. 
+It also returns the best-case, most likely, and worst-case profit margin to provide some predictability and planning.
 
 ## Key Features
 - Unit Price Calculator
 - Market Price Comparison
+- Bayesian Price Tolerance Comparison
 - Monte Carlo Profit Simulation
 
 ## Data Sources
-- Open Table via Apify
-- Rapid Food Ingredient Measurement API
+- What Chefs Want 
+- Kroger API
+- PREP
+- Bureau of Labor Statistics
 - Census.gov
-- User Inputs
 
 ## Methodology
-The app uses ***Deterministic Unit Economics Math*** to determine the price per plate based on the User Entry of their costs, overhead, and recipe, along with their desired profit margins, to return the unit price that achieves the desired profit margin. 
-Using competitor prices in the area provides the probability of market tolerance for that price. A Monte Carlo Simulation reports the probability of hitting the profit margins for a best-case, most likely, and worst-case scenario to provide some predictability and planning.
+The app uses ***Deterministic Unit Economics Math*** to determine the price per plate based on its Database of ingredient prices, updated routinely from USDA, What Chefs Want, Costco Wholesale, average wages published by the Bureau of Labor Statistics, and average rent in their area, along with their desired profit margins to return the unit price to achieve this goal. 
+Furthermore, a Bayesian Regression Model trained on competitor prices in the area provides the probability of market tolerance for that price, based on reported annual income and competitor pricing in that zip code. 
+A Monte Carlo Simulation reports the profit margins for a best-case, most likely, and worst-case scenario to provide some predictability and planning.
 
 ## Tech Stack
 - PostgreSQL with DBeaver for Database Management to handle large volumes of data cleaning and manipulation
@@ -72,54 +58,51 @@ Using competitor prices in the area provides the probability of market tolerance
 
 ## Database Schema
 
-### Table: zip_code
+### Table: ingredients
+| Column | Type | Description |
+|--------|------|-------------|
+| ingredient_id | INT | Primary key |
+| name | VARCHAR | Ingredient name (flour, butter, etc.) |
+| price | DECIMAL | Price per unit |
+| unit | VARCHAR | Unit of measure (lb, oz, each) |
+| min_purchase_qty | DECIMAL | Minimum wholesale purchase quantity |
+| min_purchase_unit | VARCHAR | Unit for minimum purchase |
+| source | VARCHAR | Where price came from (USDA, WhatChefsWant, etc.) |
+| last_updated | DATE | When price was last updated |
+
+### Table: zip_codes
 | Column | Type | Description |
 |--------|------|-------------|
 | zip_code | VARCHAR | Primary key |
-| annual_income | Decimal(10,2) | median annual income
+| city | VARCHAR | City name |
+| median_income | INT | Median household income |
+| avg_rent_commercial | DECIMAL | Average commercial rent per sq ft |
+| avg_wage_food_service | DECIMAL | Average food service wage |
+| population | INT | Population |
+| source | VARCHAR | Data source (Census, BLS) |
 
-### Table: restaurant
+### Table: competitors
 | Column | Type | Description |
 |--------|------|-------------|
-| restaurant_id | Serial INT | Primary key |
-| restaurant_name | VARCHAR | Business name |
-| restaurant_zip_code | VARCHAR | Foreign key to zip_code |
-| cuisine_type | VARCHAR | Bakery, Italian restaurant, meal prep, etc. |
-| restaurant_review_count | int | Number of reviews |
-| restaurant_value | Decimal (10,2) | 4.1, 3.8, 4.5 |
-| restaurant_price_tier | VARCHAR | $, $$, $$$, $$$$ |
+| competitor_id | INT | Primary key |
+| name | VARCHAR | Business name |
+| zip_code | VARCHAR | Foreign key to zip_codes |
+| business_type | VARCHAR | Bakery, restaurant, meal prep, etc. |
+| item_name | VARCHAR | Menu item |
+| item_price | DECIMAL | Price charged |
+| source | VARCHAR | Yelp, Google, menu scrape |
 | scraped_date | DATE | When data was collected |
-
-### Table: menu_item
-| Column | Type | Description |
-|--------|------|-------------|
-| item_id | Serial INT | Primary key |
-| restaurant_id | INT | foreign key to restaurant |
-| item_name | VARCHAR | Item name |
-| item_desc | VARCHAR | Description of the item |
-| item_price | Decimal(10,2) | Price of the item |
-| item_category | VARCHAR | dessert, vegan, gluten-free, etc |
-| item_price_date | DATE | When data was collected |
-
-### Table: restaurant_value_rating
-| Column | Type | Description |
-|--------|------|-------------|
-| rating_id | Serial INT | Primary key |
-| restaurant_id | Int | foreign key to restaurant |
-| rating_value | int | 1,2,3,4,5 |
-| rating_count | Integer | number of reviews of each value |
-
 
 ## Project Phases
 
 **Phase 1: Planning**
-- Define scope, write documentation,
+- Define scope, write documentation, design database schema
 
 **Phase 2: Data Infrastructure**
 - Build database framework
 - Set up data pipeline
 - Web scrape competitor pricing (Yelp, menus)
-- Populate Database
+- Populate Database with ingredients, zip codes, wages
 
 **Phase 3: Exploration & Validation**
 - Explore data, check for gaps
@@ -127,22 +110,16 @@ Using competitor prices in the area provides the probability of market tolerance
 
 **Phase 4: Model Development**
 - Build a deterministic unit economics function
-- Build Market comparison tool
+- Build and train a Bayesian regression model
 - Build a Monte Carlo simulation
 - Test each component
 
-**Phase 5: User Interface**
-- Build Streamlit UI
+**Phase 5: Deployment**
+- Build Streamlit app
+- Deploy and test end-to-end
+- Monitor for drift, optimize latency, gather feedback
 
-**Phase 6: Testing + Bug Fixes**
-- Test for bugs and address any bugs
-
-**Phase 7: Add Machine Learning Features**
-- Bayesian Regression for market tolerance
-
-**Phase 8: Polish and Deploy
-
-Repeat testing, tune the model, add features like caching, load balancing, etc to improve UI and UX experience and increase uptime. 
+Repeat testing, tune the model, monitor for drift, check logs constantly for errors, tune and optimize latency, and listen for user feedback. Continue to fine-tune the model. 
 
 ## Limitations
 - This tool is not going to predict the price that you are going to sell at.
