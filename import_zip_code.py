@@ -8,9 +8,9 @@ import requests
 # Load environment variables from .env file
 load_dotenv()
 password = quote_plus(os.getenv('postgres_pwd'))
-api_key = os.getenv('zip_code_annual_income_api_key')
+census_api_key = os.getenv('zip_code_annual_income_api_key')
 
-zip_code_api_url = f'https://api.census.gov/data/2023/acs/acs5?get=B19013_001E&for=zip%20code%20tabulation%20area:*&key={api_key}'
+zip_code_api_url = f'https://api.census.gov/data/2023/acs/acs5?get=B19013_001E&for=zip%20code%20tabulation%20area:*&key={census_api_key}'
 # Create Engine connection to PostgreSQL database
 engine  = create_engine(f'postgresql+psycopg2://postgres:{password}@localhost:5432/price_per_unit_sugg')
 def fetch_zip_code_income_data(): 
