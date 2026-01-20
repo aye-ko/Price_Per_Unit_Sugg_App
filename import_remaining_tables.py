@@ -13,7 +13,7 @@ password = quote_plus(os.getenv('postgres_pwd'))
 
 engine = create_engine(f'postgresql://postgres:{password}@localhost:5432/price_per_unit_sugg')
 
-with open('dataset_opentable-reviews-cheerio_2026-01-18_19-07-52-355.json', 'r', encoding='UTF-8') as file:
+with open('dataset_opentable-reviews-cheerio_2026-01-19_23-02-06-243.json', 'r', encoding='UTF-8') as file:
     data = json.load(file)
 
 
@@ -34,14 +34,14 @@ for restaurant in data:
         'restaurant_name' : restaurant['name'],
         'restaurant_zip_code' : restaurant['postalCode'].split('-')[0],
         'cuisine_type' : next((c['name'] for c in restaurant['cuisines'] if c['primary'] == True), 'Unknown'),
-        'restaurant_review_count' : restaurant['reviews']['count'],
-        'restaurant_value' : restaurant['reviews']['value'],
-        'restaurant_price_tier': restaurant['priceBand']['label'],
+        'restaurant_review_count' : restaurant.get('reviews', {}).get('count', 0),
+        'restaurant_value' : restaurant.get('reviews', {}).get('value', 0),
+        'restaurant_price_tier': restaurant.get('priceBand', {}).get('label', 'Unknown'),
         'scraped_date' : pd.to_datetime('today').date()
         }
     restaurant_data.append(restaurant_item_data)
 
-    for rating in restaurant['reviews']['distribution']:
+    for rating in restaurant.get('reviews', {}).get('distribution', []):
         rating_data = {
             'restaurant_id': restaurant['id'],
             'rating_value': rating['value'],
@@ -50,7 +50,7 @@ for restaurant in data:
             }
         restaurant_value_ratings.append(rating_data)
             
-    for menu in restaurant['menus']:
+    for menu in restaurant.get('menus', []):
         for section in menu['sections']:
             category = section['title']
             for item in section ['items']:
