@@ -17,7 +17,7 @@
    ```
 
 ## Overview
-An app where Bakers, Chefs, Restaurateurs, and people in similar fields set the price of a single item to optimize their profit margins. They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), expected monthly customer number, and their desired profit margin, and it returns how much they should make and the price they should charge for each item, and how much to buy to meet that demand. It also returns the market tolerance for that price, the best-case and worst-case profit margins for that month, and the month's average profit margin. 
+An app where Bakers, Chefs, Restaurateurs, and people in similar fields set the price of a single item to optimize their profit margins. They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), expected monthly customer number, and their desired profit margin, and it returns price they should charge for each item. It also returns the market tolerance for that price, the best-case and worst-case profit margins for that month, and the month's average profit margin. 
 
 ## Live Demo
 [Link - placeholder for now]
@@ -27,7 +27,7 @@ Bakers, chefs, and the like know how to make delicious food, but often lack busi
 The idea is to save them time and money, while offering them some predictability in an otherwise unpredictable field. 
 
 ## How It Works
-They enter their recipes, their zip code, their overhead (employees' wages, rent, etc), and their desired profit margin. The app determines the price per plate to achieve this goal. What amount should they set to serve this number of customers and achieve the suggested best price? If they enter a number of customers above the maximum the vendor sells at wholesale, a flag is raised, and it recommends either reducing the number of customers or increasing it to meet the demand, as they see fit. It also gives an idea of the market tolerance for this price. 
+They enter their recipes, their zip code, their overhead (rent, bills etc), the time it takes to make, how many employees(or their self), their expertise level and their desired profit margin. The app determines the price per serving and the batch serving price to achieve this goal.It also gives an idea of the market tolerance for this price. 
 It also returns the best-case, most likely, and worst-case profit margin to provide some predictability and planning.
 
 ## Key Features
@@ -37,16 +37,14 @@ It also returns the best-case, most likely, and worst-case profit margin to prov
 - Monte Carlo Profit Simulation
 
 ## Data Sources
-- What Chefs Want 
-- Kroger API
-- PREP
+- Opentable.com via web-scraper API
 - Bureau of Labor Statistics
 - Census.gov
 
 ## Methodology
-The app uses ***Deterministic Unit Economics Math*** to determine the price per plate based on its Database of ingredient prices, updated routinely from USDA, What Chefs Want, Costco Wholesale, average wages published by the Bureau of Labor Statistics, and average rent in their area, along with their desired profit margins to return the unit price to achieve this goal. 
-Furthermore, a Bayesian Regression Model trained on competitor prices in the area provides the probability of market tolerance for that price, based on reported annual income and competitor pricing in that zip code. 
-A Monte Carlo Simulation reports the profit margins for a best-case, most likely, and worst-case scenario to provide some predictability and planning.
+The app uses ***Deterministic Unit Economics Math*** to determine the price per serving and batch serving price,and the user's entries to determine the cost. 
+Furthermore, a Bayesian Regression Model trained on competitor prices in the area provides the probability of market tolerance for that price.
+A Monte Carlo Simulation reports the profit margins for a best-case, most likely, and worst-case scenario to provide some predictability and planning, while accounting for waste based on the experience level of the user. 
 
 ## Tech Stack
 - PostgreSQL with DBeaver for Database Management to handle large volumes of data cleaning and manipulation
